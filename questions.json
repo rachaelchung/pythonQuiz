@@ -1,0 +1,41 @@
+{
+  "questions": [
+    {
+      "question": "What keyword is used to define a function in Python?",
+      "type": "multChoice",
+      "options": ["func", "define", "def", "function"],
+      "answer": "def",
+      "explanation": "def is used at the beginning of functions right before naming them.",
+      "id": 1
+    },
+    {
+      "question": "A list in Python is immutable.",
+      "type": "trueFalse",
+      "answer": "false",
+      "explanation": "lists are able to be changed",
+      "id": 2
+    },
+    {
+      "question": "What built-in function returns the number of items in a list?",
+      "type": "shortAnswer",
+      "answer": "len",
+      "explanation": "len is short for length, and returns the length of the list or the number of items",
+      "id": 3
+    },
+    {
+      "question": "A number shown as a decimal in python is called a ___",
+      "type": "fillInTheBlank",
+      "answer": "float",
+      "explanation": "float is short for 'floating point number'",
+      "id": 4
+    },
+    {
+      "question": "x = [1, 2, 3]; print(x[-1])",
+      "type": "multChoice",
+      "options": ["1", "2", "3", "None of the above"],
+      "answer": "3",
+      "explanation": "[-1] will index a list to the last item",
+      "id": 5
+    }
+  ]
+}
