@@ -41,6 +41,33 @@
         "score_history": []
       },
       "hidden_questions": []
+    },
+    {
+      "username": "rachung",
+      "password_hash": "27cc6994fc1c01ce6659c6bddca9b69c4c6a9418065e612c69d110b3f7b11f8a",
+      "question_progress": {
+        "1": "learned",
+        "2": "learned",
+        "3": "learned",
+        "4": "learned",
+        "5": "learned"
+      },
+      "stats": {
+        "total_answered": 5,
+        "total_correct": 5,
+        "total_incorrect": 0,
+        "total_not_seen": 0,
+        "total_mastered": 0,
+        "total_points": 5,
+        "score_history": [
+          {
+            "date": "2026-03-26 17:01:57",
+            "questions_answered": 5,
+            "points_earned": 5
+          }
+        ]
+      },
+      "hidden_questions": []
     }
   ]
 }
