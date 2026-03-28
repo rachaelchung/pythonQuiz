@@ -4,11 +4,19 @@ import os
 import hashlib
 import time
 import random
+import select
+import sys
 from datetime import datetime
 
 # File paths
 QUESTIONS_FILE = "questions.json"
 USERS_FILE = "users.json"
+
+# Difficulty levels
+DIFFICULTY_NEW = "new"
+DIFFICULTY_STILL_LEARNING = "still learning"
+DIFFICULTY_LEARNED = "learned"
+DIFFICULTY_MASTERED = "mastered"
 
 
 class QuizApp:
@@ -20,6 +28,8 @@ class QuizApp:
     def _load_users(self):
         """Load users from JSON file, create if doesn't exist."""
         if not os.path.exists(USERS_FILE):
+            with open(USERS_FILE, "w") as f:
+                json.dump({"users": []}, f)
             return {"users": []}
         try:
             with open(USERS_FILE, "r") as f:
@@ -32,10 +42,29 @@ class QuizApp:
         """Load questions from JSON file."""
         try:
             with open(QUESTIONS_FILE, "r") as f:
-                return json.load(f)
+                data = json.load(f)
+                # Validate and filter questions
+                valid_questions = []
+                for q in data.get("questions", []):
+                    if self._is_valid_question(q):
+                        valid_questions.append(q)
+                    else:
+                        print(f"Warning: Skipping invalid question (missing required fields): {q.get('id', 'unknown id')}")
+                return {"questions": valid_questions}
         except (json.JSONDecodeError, IOError) as e:
             print(f"Error reading questions file: {e}")
             return {"questions": []}
+
+    def _is_valid_question(self, question):
+        """Check if a question has all required fields."""
+        required_fields = ["question", "type", "answer", "id", "explanation"]
+        if not all(field in question for field in required_fields):
+            return False
+        if question["type"] not in ["multChoice", "trueFalse", "shortAnswer", "fillInTheBlank"]:
+            return False
+        if question["type"] == "multChoice" and "options" not in question:
+            return False
+        return True
 
     def _save_users(self):
         """Save users data to JSON file."""
@@ -60,12 +89,21 @@ class QuizApp:
         """Initialize question progress for a new user."""
         progress = {}
         for q in self.questions_data.get("questions", []):
-            progress[str(q["id"])] = "new"
+            progress[str(q["id"])] = DIFFICULTY_NEW
         return progress
 
     def clear_screen(self):
         """Clear the console screen."""
         os.system("clear" if os.name == "posix" else "cls")
+
+    def _timed_input(self, prompt, timeout):
+        """Get input with a timeout."""
+        print(prompt, end='', flush=True)
+        ready, _, _ = select.select([sys.stdin], [], [], timeout)
+        if ready:
+            return sys.stdin.readline().strip()
+        else:
+            return None
 
     def run(self):
         """Main application loop."""
@@ -233,7 +271,13 @@ class QuizApp:
         questions = self.questions_data.get("questions", [])
         available_questions = [q for q in questions if q["id"] not in self.current_user["hidden_questions"]]
         
-        if not available_questions:
+        if len(questions) == 0:
+            self.clear_screen()
+            print("no questions found, please try again later.")
+            input("Press Enter to return to menu...")
+            self.clear_screen()
+            return
+        elif not available_questions:
             self.clear_screen()
             print("No questions available. All questions have been hidden.")
             input("Press Enter to return to menu...")
@@ -261,39 +305,39 @@ class QuizApp:
 
     def _get_question_difficulty(self, question_id):
         """Get the difficulty level of a question for the current user."""
-        return self.current_user["question_progress"].get(str(question_id), "new")
+        return self.current_user["question_progress"].get(str(question_id), DIFFICULTY_NEW)
 
     def _get_question_config(self, difficulty):
         """Get time limit and points for a question difficulty."""
         config = {
-            "new": {"time": 60, "points": 1},
-            "still learning": {"time": 30, "points": 1},
-            "learned": {"time": 30, "points": 2},
-            "mastered": {"time": 20, "points": 3}
+            DIFFICULTY_NEW: {"time": 60, "points": 1},
+            DIFFICULTY_STILL_LEARNING: {"time": 30, "points": 1},
+            DIFFICULTY_LEARNED: {"time": 30, "points": 2},
+            DIFFICULTY_MASTERED: {"time": 20, "points": 3}
         }
         return config.get(difficulty, {"time": 60, "points": 1})
 
     def _select_next_question(self, available_questions, asked_ids):
         """Select next question based on difficulty priority."""
-        remaining = [q for q in available_questions if q["id"] not in asked_ids]
+        remaining = [q for q in available_questions if q["id"] not in asked_ids and q["id"] not in self.current_user["hidden_questions"]]
         
         if not remaining:
             return None
         
         # Prioritize by difficulty: new > still learning > learned > mastered
-        new_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == "new"]
+        new_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == DIFFICULTY_NEW]
         if new_qs:
             return random.choice(new_qs)
         
-        learning_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == "still learning"]
+        learning_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == DIFFICULTY_STILL_LEARNING]
         if learning_qs:
             return random.choice(learning_qs)
         
-        learned_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == "learned"]
+        learned_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == DIFFICULTY_LEARNED]
         if learned_qs:
             return random.choice(learned_qs)
         
-        mastered_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == "mastered"]
+        mastered_qs = [q for q in remaining if self._get_question_difficulty(q["id"]) == DIFFICULTY_MASTERED]
         if mastered_qs:
             return random.choice(mastered_qs)
         
@@ -330,122 +374,167 @@ class QuizApp:
             print(f"Time: {config['time']}s | Points: {config['points']}")
             print()
             
-            is_correct, timed_out = self._ask_question(question, config["time"])
+            is_correct, timed_out, count = self._ask_question(question, config["time"])
             
             # Update user progress
-            if is_correct:
-                session_correct += 1
-                session_points += config["points"]
-                
-                # Update difficulty
-                if difficulty == "new":
-                    self.current_user["question_progress"][str(question["id"])] = "learned"
-                elif difficulty == "learned":
-                    self.current_user["question_progress"][str(question["id"])] = "mastered"
-            else:
-                session_incorrect += 1
-                
-                # Update difficulty
-                if difficulty == "mastered":
-                    self.current_user["question_progress"][str(question["id"])] = "still learning"
-                elif difficulty == "learned":
-                    self.current_user["question_progress"][str(question["id"])] = "still learning"
-                elif difficulty == "new":
-                    self.current_user["question_progress"][str(question["id"])] = "still learning"
+            if count:
+                if is_correct:
+                    session_correct += 1
+                    session_points += config["points"]
+                    
+                    # Update difficulty
+                    if difficulty == DIFFICULTY_NEW:
+                        self.current_user["question_progress"][str(question["id"])] = DIFFICULTY_LEARNED
+                    elif difficulty == DIFFICULTY_STILL_LEARNING:
+                        self.current_user["question_progress"][str(question["id"])] = DIFFICULTY_LEARNED
+                    elif difficulty == DIFFICULTY_LEARNED:
+                        self.current_user["question_progress"][str(question["id"])] = DIFFICULTY_MASTERED
+                else:
+                    session_incorrect += 1
+                    
+                    # Update difficulty
+                    if difficulty == DIFFICULTY_MASTERED:
+                        self.current_user["question_progress"][str(question["id"])] = DIFFICULTY_STILL_LEARNING
+                    elif difficulty == DIFFICULTY_LEARNED:
+                        self.current_user["question_progress"][str(question["id"])] = DIFFICULTY_STILL_LEARNING
+                    elif difficulty == DIFFICULTY_NEW:
+                        self.current_user["question_progress"][str(question["id"])] = DIFFICULTY_STILL_LEARNING
         
-        # Update overall stats
-        self.current_user["stats"]["total_answered"] += session_correct + session_incorrect
-        self.current_user["stats"]["total_correct"] += session_correct
-        self.current_user["stats"]["total_incorrect"] += session_incorrect
-        self.current_user["stats"]["total_points"] += session_points
-        
-        # Calculate not seen
-        not_seen = sum(1 for q in available_questions 
-                      if self._get_question_difficulty(q["id"]) == "new")
-        self.current_user["stats"]["total_not_seen"] = not_seen
-        
-        # Calculate mastered
-        mastered = sum(1 for q in available_questions 
-                      if self._get_question_difficulty(q["id"]) == "mastered")
-        self.current_user["stats"]["total_mastered"] = mastered
-        
-        # Add to score history
-        self.current_user["stats"]["score_history"].append({
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "questions_answered": session_correct + session_incorrect,
-            "points_earned": session_points
-        })
-        
-        self._save_users()
-        
-        # Show results
-        self._show_quiz_results(session_correct, session_incorrect, session_points, num_questions)
+        if session_correct + session_incorrect > 0:
+            # Update overall stats
+            self.current_user["stats"]["total_answered"] += session_correct + session_incorrect
+            self.current_user["stats"]["total_correct"] += session_correct
+            self.current_user["stats"]["total_incorrect"] += session_incorrect
+            self.current_user["stats"]["total_points"] += session_points
+            
+            # Calculate not seen
+            not_seen = sum(1 for q in available_questions 
+                          if self._get_question_difficulty(q["id"]) == DIFFICULTY_NEW)
+            self.current_user["stats"]["total_not_seen"] = not_seen
+            
+            # Calculate mastered
+            mastered = sum(1 for q in available_questions 
+                          if self._get_question_difficulty(q["id"]) == DIFFICULTY_MASTERED)
+            self.current_user["stats"]["total_mastered"] = mastered
+            
+            # Add to score history
+            self.current_user["stats"]["score_history"].append({
+                "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "questions_answered": session_correct + session_incorrect,
+                "points_earned": session_points
+            })
+            
+            self._save_users()
+            
+            # Show results
+            self._show_quiz_results(session_correct, session_incorrect, session_points, num_questions)
+        else:
+            self.clear_screen()
+            print("No questions remaining.")
+            input("Press Enter to return to menu...")
+            self.clear_screen()
 
     def _ask_question(self, question, time_limit):
         """Ask a question and return whether it was answered correctly."""
         print(f"Q: {question['question']}")
         
         if question["type"] == "multChoice":
+            self.clear_screen()
+            print(f"Q: {question['question']}")
             options = question["options"]
             for i, option in enumerate(options, 1):
                 print(f"{i}. {option}")
             
-            self.clear_screen()
-            print(f"Q: {question['question']}")
-            for i, option in enumerate(options, 1):
-                print(f"{i}. {option}")
-            
-            answer = input(f"\nYour answer (1-{len(options)}): ").strip()
-            try:
-                answer_idx = int(answer) - 1
-                if 0 <= answer_idx < len(options):
-                    user_answer = options[answer_idx]
-                    is_correct = user_answer.lower() == question["answer"].lower()
-                else:
+            start_time = time.time()
+            while True:
+                elapsed = time.time() - start_time
+                remaining_time = max(0, time_limit - elapsed)
+                answer = self._timed_input(f"\nYour answer (1-{len(options)}): ", remaining_time)
+                if answer is None:
+                    timed_out = True
                     is_correct = False
-            except ValueError:
-                is_correct = False
+                    break
+                try:
+                    answer_idx = int(answer) - 1
+                    if 0 <= answer_idx < len(options):
+                        user_answer = options[answer_idx]
+                        is_correct = user_answer.lower() == question["answer"].lower()
+                        timed_out = False
+                        break
+                    else:
+                        print(f"Invalid choice. Please enter a number between 1 and {len(options)}.")
+                except ValueError:
+                    print(f"Invalid input. Please enter a number between 1 and {len(options)}.")
         
         elif question["type"] == "trueFalse":
-            print("1. True")
-            print("2. False")
-            
             self.clear_screen()
             print(f"Q: {question['question']}")
             print("1. True")
             print("2. False")
             
-            answer = input("\nYour answer (1-2): ").strip()
-            user_answer = "true" if answer == "1" else "false" if answer == "2" else ""
-            is_correct = user_answer == question["answer"].lower()
+            start_time = time.time()
+            while True:
+                elapsed = time.time() - start_time
+                remaining_time = max(0, time_limit - elapsed)
+                answer = self._timed_input("\nYour answer (1-2): ", remaining_time)
+                if answer is None:
+                    timed_out = True
+                    is_correct = False
+                    break
+                if answer == "1":
+                    user_answer = "true"
+                    is_correct = user_answer == question["answer"].lower()
+                    timed_out = False
+                    break
+                elif answer == "2":
+                    user_answer = "false"
+                    is_correct = user_answer == question["answer"].lower()
+                    timed_out = False
+                    break
+                else:
+                    print("Invalid choice. Please enter 1 for True or 2 for False.")
         
         elif question["type"] == "shortAnswer":
-            answer = input("\nYour answer: ").strip()
-            if not answer:
+            answer = self._timed_input("\nYour answer: ", time_limit)
+            if answer is None:
+                timed_out = True
                 is_correct = False
             else:
-                is_correct = answer.lower() == question["answer"].lower()
+                timed_out = False
+                if not answer:
+                    is_correct = False
+                else:
+                    is_correct = answer.lower() == question["answer"].lower()
         
         elif question["type"] == "fillInTheBlank":
-            answer = input("\nYour answer: ").strip()
-            if not answer:
+            answer = self._timed_input("\nYour answer: ", time_limit)
+            if answer is None:
+                timed_out = True
                 is_correct = False
             else:
-                is_correct = answer.lower() == question["answer"].lower()
+                timed_out = False
+                if not answer:
+                    is_correct = False
+                else:
+                    is_correct = answer.lower() == question["answer"].lower()
         
         else:
+            timed_out = False
             is_correct = False
         
         # Show answer screen
-        self._show_answer_screen(question, is_correct)
+        action = self._show_answer_screen(question, is_correct, timed_out)
+        count_this_question = action != 'flag'
         
-        return is_correct, False
+        return is_correct, timed_out, count_this_question
 
-    def _show_answer_screen(self, question, is_correct):
+    def _show_answer_screen(self, question, is_correct, timed_out=False):
         """Show the answer screen after a question."""
         self.clear_screen()
         
-        if is_correct:
+        if timed_out:
+            print("⏰ TIME'S UP!")
+        elif is_correct:
             print("✓ CORRECT!")
         else:
             print("✗ INCORRECT")
@@ -460,6 +549,9 @@ class QuizApp:
         
         if choice == "2":
             self._flag_question(question["id"])
+            return 'flag'
+        else:
+            return 'continue'
 
     def _flag_question(self, question_id):
         """Flag/hide a question."""

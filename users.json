@@ -46,26 +46,283 @@
       "username": "rachung",
       "password_hash": "27cc6994fc1c01ce6659c6bddca9b69c4c6a9418065e612c69d110b3f7b11f8a",
       "question_progress": {
-        "1": "learned",
-        "2": "learned",
+        "1": "mastered",
+        "2": "mastered",
         "3": "learned",
         "4": "learned",
-        "5": "learned"
+        "5": "still learning"
       },
       "stats": {
-        "total_answered": 5,
-        "total_correct": 5,
-        "total_incorrect": 0,
+        "total_answered": 8,
+        "total_correct": 7,
+        "total_incorrect": 1,
         "total_not_seen": 0,
-        "total_mastered": 0,
-        "total_points": 5,
+        "total_mastered": 2,
+        "total_points": 9,
         "score_history": [
           {
             "date": "2026-03-26 17:01:57",
             "questions_answered": 5,
             "points_earned": 5
+          },
+          {
+            "date": "2026-03-27 17:24:20",
+            "questions_answered": 3,
+            "points_earned": 4
           }
         ]
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
+      },
+      "hidden_questions": []
+    },
+    {
+      "username": "testuser",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "question_progress": {
+        "1": "new",
+        "2": "new",
+        "3": "new",
+        "4": "new",
+        "5": "new"
+      },
+      "stats": {
+        "total_answered": 0,
+        "total_correct": 0,
+        "total_incorrect": 0,
+        "total_not_seen": 5,
+        "total_mastered": 0,
+        "total_points": 0,
+        "score_history": []
       },
       "hidden_questions": []
     }
