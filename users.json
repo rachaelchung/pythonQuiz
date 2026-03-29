@@ -48,17 +48,17 @@
       "question_progress": {
         "1": "mastered",
         "2": "mastered",
-        "3": "learned",
-        "4": "learned",
+        "3": "mastered",
+        "4": "mastered",
         "5": "still learning"
       },
       "stats": {
-        "total_answered": 8,
-        "total_correct": 7,
-        "total_incorrect": 1,
+        "total_answered": 13,
+        "total_correct": 11,
+        "total_incorrect": 2,
         "total_not_seen": 0,
-        "total_mastered": 2,
-        "total_points": 9,
+        "total_mastered": 4,
+        "total_points": 19,
         "score_history": [
           {
             "date": "2026-03-26 17:01:57",
@@ -69,6 +69,11 @@
             "date": "2026-03-27 17:24:20",
             "questions_answered": 3,
             "points_earned": 4
+          },
+          {
+            "date": "2026-03-29 00:14:33",
+            "questions_answered": 5,
+            "points_earned": 10
           }
         ]
       },
